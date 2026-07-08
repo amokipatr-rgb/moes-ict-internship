@@ -15,8 +15,10 @@ OUT_DIR = r"E:\internship task\week_four_task"
 # STEP 1: Normalize text fields
 # =====================================================
 def normalize_text(text):
-    """Normalize text by trimming whitespace, fixing casing, and collapsing spaces."""
-    # DEV BRANCH: Enhanced docstring with regex explanation for edge-case handling
+    """Trim whitespace, fix casing, collapse multiple spaces, and handle edge cases."""
+    # MERGED RESOLUTION: Combined dev docstring (comprehensive) + hotfix brevity
+    # Rationale: Both branches had valid improvements; the final version preserves
+    # the complete explanation from dev while adopting the cleaner phrasing from hotfix.
     """Trim whitespace, fix casing, remove extra spaces."""
     if not text:
         return ""
