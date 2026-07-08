@@ -1,0 +1,51 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.10.11, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Richie\AppData\Local\Programs\Python\Python310\python.exe
+cachedir: .pytest_cache
+rootdir: E:\internship task\week_five_task
+plugins: anyio-4.9.0, dash-3.1.1
+collecting ... collected 42 items
+
+test_etl_cleaner.py::TestNormalizeText::test_basic_casing PASSED         [  2%]
+test_etl_cleaner.py::TestNormalizeText::test_collapse_spaces PASSED      [  4%]
+test_etl_cleaner.py::TestNormalizeText::test_strip_whitespace PASSED     [  7%]
+test_etl_cleaner.py::TestNormalizeText::test_stop_words_lowercase PASSED [  9%]
+test_etl_cleaner.py::TestNormalizeText::test_empty_string PASSED         [ 11%]
+test_etl_cleaner.py::TestNormalizeText::test_none_input PASSED           [ 14%]
+test_etl_cleaner.py::TestNormalizeName::test_remove_digits PASSED        [ 16%]
+test_etl_cleaner.py::TestNormalizeName::test_keep_apostrophe PASSED      [ 19%]
+test_etl_cleaner.py::TestNormalizeName::test_keep_hyphen PASSED          [ 21%]
+test_etl_cleaner.py::TestNormalizeName::test_strip_special_chars PASSED  [ 23%]
+test_etl_cleaner.py::TestNormalizeName::test_empty_string PASSED         [ 26%]
+test_etl_cleaner.py::TestNormalizeName::test_none_input PASSED           [ 28%]
+test_etl_cleaner.py::TestNormalizeGrade::test_primary_abbrev PASSED      [ 30%]
+test_etl_cleaner.py::TestNormalizeGrade::test_primary_full PASSED        [ 33%]
+test_etl_cleaner.py::TestNormalizeGrade::test_senior_abbrev PASSED       [ 35%]
+test_etl_cleaner.py::TestNormalizeGrade::test_senior_full PASSED         [ 38%]
+test_etl_cleaner.py::TestNormalizeGrade::test_empty_string PASSED        [ 40%]
+test_etl_cleaner.py::TestNormalizeGrade::test_none_input PASSED          [ 42%]
+test_etl_cleaner.py::TestParseDob::test_standard_iso PASSED              [ 45%]
+test_etl_cleaner.py::TestParseDob::test_mm_dd_yyyy PASSED                [ 47%]
+test_etl_cleaner.py::TestParseDob::test_dd_mm_yyyy PASSED                [ 50%]
+test_etl_cleaner.py::TestParseDob::test_empty_string PASSED              [ 52%]
+test_etl_cleaner.py::TestParseDob::test_none_input PASSED                [ 54%]
+test_etl_cleaner.py::TestParseDob::test_year_first_with_slash PASSED     [ 57%]
+test_etl_cleaner.py::TestNormalizeGender::test_male_full PASSED          [ 59%]
+test_etl_cleaner.py::TestNormalizeGender::test_female_full PASSED        [ 61%]
+test_etl_cleaner.py::TestNormalizeGender::test_m_abbrev PASSED           [ 64%]
+test_etl_cleaner.py::TestNormalizeGender::test_f_abbrev PASSED           [ 66%]
+test_etl_cleaner.py::TestNormalizeGender::test_case_insensitive PASSED   [ 69%]
+test_etl_cleaner.py::TestNormalizeGender::test_empty_string PASSED       [ 71%]
+test_etl_cleaner.py::TestNormalizeGender::test_none_input PASSED         [ 73%]
+test_etl_cleaner.py::TestMatchSchool::test_exact_match PASSED            [ 76%]
+test_etl_cleaner.py::TestMatchSchool::test_partial_match PASSED          [ 78%]
+test_etl_cleaner.py::TestMatchSchool::test_no_match PASSED               [ 80%]
+test_etl_cleaner.py::TestMatchSchool::test_empty_string PASSED           [ 83%]
+test_etl_cleaner.py::TestRegionMapping::test_all_expected_regions PASSED [ 85%]
+test_etl_cleaner.py::TestRegionMapping::test_all_schools_mapped PASSED   [ 88%]
+test_etl_cleaner.py::TestRegionMapping::test_school_count_per_region PASSED [ 90%]
+test_etl_cleaner.py::TestCapEnforcement::test_cap_value_correct PASSED   [ 92%]
+test_etl_cleaner.py::TestCapEnforcement::test_no_school_exceeds_cap PASSED [ 95%]
+test_etl_cleaner.py::TestDuplicateDetection::test_same_name_same_school_is_duplicate PASSED [ 97%]
+test_etl_cleaner.py::TestDuplicateDetection::test_different_names_not_duplicates PASSED [100%]
+
+============================= 42 passed in 0.10s ==============================

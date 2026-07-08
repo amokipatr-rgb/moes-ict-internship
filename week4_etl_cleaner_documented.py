@@ -135,12 +135,13 @@ def parse_dob(text: Optional[str]) -> Optional[str]:
     m = re.match(r'(\d{4})-(\d{1,2})-(\d{1,2})', text)
     if m:
         return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+    m = re.match(r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})', text)
+    if m:
+        return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
     m = re.match(r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})', text)
     if m:
         parts = re.split(r'[/-]', text)
-        if len(parts[0]) == 4:
-            return f"{parts[0]}-{int(parts[1]):02d}-{int(parts[2]):02d}"
-        elif len(parts[2]) == 4:
+        if len(parts[2]) == 4:
             return f"{parts[2]}-{int(parts[1]):02d}-{int(parts[0]):02d}"
     return None
 
