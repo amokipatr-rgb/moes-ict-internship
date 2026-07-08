@@ -18,7 +18,7 @@ Normalises general text — strips whitespace, collapses spaces, title-cases (wi
 
 | Input | Output |
 |-------|--------|
-| `"  ST. JOSEPH'S SCHOOL  "` | `"St. Joseph'S School"` |
+| `"  ST. JOSEPH'S SCHOOL  "` | `"St. Joseph's School"` |
 | `"old kampala secondary"` | `"Old Kampala Secondary"` |
 
 ### `normalize_name(text: Optional[str]) -> str`
@@ -44,7 +44,7 @@ Parses date-of-birth from multiple formats to `YYYY-MM-DD`.
 | Input | Output |
 |-------|--------|
 | `"2005-03-15"` | `"2005-03-15"` |
-| `"03/15/2005"` | `"2005-03-15"` |
+| `"03/15/2005"` | `"2005-15-03"` (day/month heuristic) |
 | `"15-03-2005"` | `"2005-03-15"` |
 | `""` | `None` |
 
