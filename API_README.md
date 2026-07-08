@@ -137,3 +137,25 @@ See `test_etl_cleaner.py` for 10+ unit tests covering:
 - Duplicate detection
 - Region mapping
 - Empty/edge-case inputs
+
+---
+
+## Rationale — Why This Document Exists
+
+1. **Separation of concerns.** Pipeline code (`week4_etl_cleaner_documented.py`) focuses on correct logic; the API reference documents the contract without cluttering the source.
+2. **Audience.** NITA-U auditors, EMIS administrators, and future interns need a quick-entry guide — they should not have to read 512 lines of Python to understand what the pipeline does.
+3. **Onboarding.** A new intern can read this document in 5 minutes and know input requirements, output structure, and error behaviour without running a single command.
+
+### Why pytest over unittest?
+
+- `pytest` requires ~60 % less boilerplate (no `self`, no class inheritance required).
+- Failing output is colour-coded and shows local variable values by default.
+- `pytest` is the de facto standard in the Python data engineering community — the same ecosystem used by MoES/EMIS data teams.
+
+### Why imperative mood in Git commits ("feat: add", "fix: correct")?
+
+The Conventional Commits specification (widely adopted in open-source and government projects) uses the imperative mood because each commit message completes the sentence *"This commit will..."*. This makes history scannable and generates consistent CHANGELOGs automatically.
+
+### Why Google-style docstrings?
+
+Google-style is chosen over NumPy or reStructuredText because it is the most compact while remaining Sphinx-compatible. In a 512-line pipeline script, NumPy-style would add ~30 % vertical overhead for no additional information — every line counts for readability.

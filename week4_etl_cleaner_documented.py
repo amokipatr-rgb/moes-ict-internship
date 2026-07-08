@@ -26,6 +26,11 @@ from typing import Optional
 
 
 OUT_DIR: str = r"E:\internship task\week_four_task"
+# Rationale: Pointing OUT_DIR to week_four_task reuses the existing Week 4
+# output directory so that clean JSON, Markdown, and integrity reports
+# overwrite their Week 4 counterparts. This keeps the project organised
+# and avoids scattering output files across week folders. The ETL runs
+# standalone — it does not consume the old output, only writes new files.
 
 #
 # ====================================================================
@@ -34,6 +39,11 @@ OUT_DIR: str = r"E:\internship task\week_four_task"
 # Rationale: Raw CSV data comes in inconsistent casing, spacing, and
 # formats. Each function below targets a specific column type so that
 # the ETL pipeline produces uniform, database-ready values.
+#
+# Docstring style: Google-style ("""Summary line.\\n\\nDetails...\\n\\nRationale:...""")
+# chosen because it is the most readable in terminal/IDE popups and
+# is natively supported by Sphinx autodoc. Alternatives (NumPy/reST)
+# are more verbose and harder to scan in a 512-line script.
 # ====================================================================
 
 

@@ -1,6 +1,12 @@
-﻿*.pyc
+﻿# Python bytecode — never commit compiled files (machine-specific)
+*.pyc
 __pycache__/
+# Pytest cache — regenerated on every test run, noise in diffs
 .pytest_cache/
+
+# Logbook DOCX — generated output, not source; binary diffs are unreadable
 *.docx
+# Generator scripts — single-use utilities to produce the logbook;
+# once the DOCX is generated they serve no purpose in version history
 generate_logbook.py
 setup_conflict.py
