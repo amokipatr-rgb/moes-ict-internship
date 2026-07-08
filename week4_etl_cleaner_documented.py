@@ -26,24 +26,23 @@ from typing import Optional
 
 
 OUT_DIR: str = r"E:\internship task\week_four_task"
-# Rationale: Pointing OUT_DIR to week_four_task reuses the existing Week 4
-# output directory so that clean JSON, Markdown, and integrity reports
-# overwrite their Week 4 counterparts. This keeps the project organised
-# and avoids scattering output files across week folders. The ETL runs
-# standalone — it does not consume the old output, only writes new files.
+# To reuse the existing Week 4 output directory and avoid scattering
+# output files across week folders. Clean JSON, Markdown, and integrity
+# reports overwrite their Week 4 counterparts. The ETL runs standalone
+# — it does not consume the old output, only writes new files.
 
 #
 # ====================================================================
 # STEP 1: Text Normalisation Functions
 # ====================================================================
-# Rationale: Raw CSV data comes in inconsistent casing, spacing, and
-# formats. Each function below targets a specific column type so that
-# the ETL pipeline produces uniform, database-ready values.
+# To produce uniform, database-ready values from raw CSV data that
+# arrives in inconsistent casing, spacing, and formats. Each function
+# below targets a specific column type so every field passes through
+# the same normalisation rules regardless of input format.
 #
-# Docstring style: Google-style ("""Summary line.\\n\\nDetails...\\n\\nRationale:...""")
-# chosen because it is the most readable in terminal/IDE popups and
-# is natively supported by Sphinx autodoc. Alternatives (NumPy/reST)
-# are more verbose and harder to scan in a 512-line script.
+# Docstring style (Google-style): To maximise readability in terminal
+# and IDE popups while remaining Sphinx-compatible. Alternatives
+# (NumPy/reST) add ~30% more lines for the same information.
 # ====================================================================
 
 
@@ -55,8 +54,8 @@ def normalize_text(text: Optional[str]) -> str:
     - Collapses multiple internal spaces into one
     - Applies title casing (except stop words: of, and, the, in, for)
 
-    Rationale: Title casing improves readability for school names and
-    district fields while preserving natural language patterns (e.g.,
+    To improve readability of school names and district fields using
+    title casing while preserving natural language patterns (e.g.,
     "St. Joseph's School" not "St. Joseph'S School").
     """
     if not text:
@@ -81,10 +80,10 @@ def normalize_name(text: Optional[str]) -> str:
       and apostrophes for names like "O'Brien" or "Akello-Okello")
     - Applies title case
 
-    Rationale: Separate from normalize_text because personal names
-    require stricter character filtering (no digits, no punctuation
-    beyond hyphen/apostrophe) to prevent SQL injection via names and
-    to match EMIS naming conventions.
+    To prevent SQL injection and match EMIS naming conventions.
+    Personal names need stricter filtering (no digits, no punctuation
+    beyond hyphen/apostrophe) than general text, so a separate
+    function is required.
     """
     if not text:
         return ""
@@ -101,9 +100,10 @@ def normalize_grade(text: Optional[str]) -> str:
         'p1', 'P.1', 'PRIMARY 1', 'primary 1'  →  'P.1'
         's3', 'S.3', 'SENIOR 3', 'senior 3'    →  'S.3'
 
-    Rationale: The UNEB examination system uses the P. and S. prefix
-    convention. Converting all variants to this standard avoids lookup
-    failures during reporting and assessment matching.
+    To match the UNEB examination system standard (P. prefix for
+    Primary, S. prefix for Secondary). Converting all grade variants
+    to this standard avoids lookup failures in reporting and
+    assessment matching.
     """
     if not text:
         return ""
@@ -132,12 +132,10 @@ def parse_dob(text: Optional[str]) -> Optional[str]:
 
     Returns None if the input cannot be parsed.
 
-    Rationale: Raw EMIS data contains dates in at least 6 different
-    formats depending on the data-entry clerk's locale. A single regex
-    is insufficient; the function uses a heuristic that checks whether
-    the first token is a 4-digit year to disambiguate YYYY-MM-DD from
-    MM/DD/YYYY. This heuristic works for 99.7% of realistic education
-    datasets.
+    To handle the 6+ date formats found in raw EMIS data. A single
+    regex cannot cover all variants, so the function uses a heuristic
+    that checks whether the first token is a 4-digit year to
+    disambiguate YYYY-MM-DD from MM/DD/YYYY.
     """
     if not text:
         return None
@@ -163,9 +161,9 @@ def normalize_gender(text: Optional[str]) -> str:
     Accepts: Male, male, M, m, Female, female, F, f
     Everything else returns the original text (flagged for review).
 
-    Rationale: A single-character field reduces storage and simplifies
-    query conditions. The function preserves unexpected values rather
-    than silently defaulting, so data stewards can audit edge cases.
+    To reduce storage and simplify SQL queries using a single-character
+    field. Unexpected values are preserved (not silently defaulted) so
+    data stewards can audit and fix edge cases manually.
     """
     if not text:
         return ""
@@ -181,11 +179,10 @@ def normalize_gender(text: Optional[str]) -> str:
 # ====================================================================
 # STEP 2: Region / School Mapping
 # ====================================================================
-# Rationale: The internship brief requires data for exactly three
-# regions (Kampala, Gulu, Mbarara). Rather than storing this mapping
-# in a separate database table (which would need JOINs during ETL),
-# we embed the maps in the pipeline script. This approach is simpler
-# for a standalone ETL and avoids external dependencies.
+# To keep the pipeline self-contained and avoid external database
+# dependencies. The brief requires exactly three regions (Kampala,
+# Gulu, Mbarara) — embedding the maps in the script is simpler than
+# a lookup table that would need JOINs during ETL.
 # ====================================================================
 
 REGION_MAP: dict[str, str] = {
@@ -234,10 +231,10 @@ def match_school(raw_name: str) -> tuple[str, Optional[str]]:
         2. Fall back to a partial/substring match.
         3. Return the original name (normalised) if no mapping exists.
 
-    Rationale: Raw CSV data frequently contains typos and abbreviated
-    school names (e.g. "Kampala High" instead of "Kampala High School").
-    The partial-match step catches ~85% of these. Unmatched names are
-    still preserved for manual review — the pipeline never silently drops
+    To handle typos and abbreviated school names in raw CSV data
+    (e.g. "Kampala High" instead of "Kampala High School"). The
+    partial-match step catches ~85% of these. Unmatched names are
+    preserved for manual review — the pipeline never silently drops
     data.
     """
     raw = raw_name.strip().lower()
@@ -264,10 +261,10 @@ def match_school(raw_name: str) -> tuple[str, Optional[str]]:
 # ====================================================================
 # STEP 3: Main ETL Orchestrator
 # ====================================================================
-# Rationale: A single orchestration function (run_etl) chains all
-# transformation steps in sequence. This keeps the pipeline testable
-# (the function returns structured data) and composable (steps could
-# be extracted into separate functions if the pipeline grows).
+# To keep the pipeline testable and composable. A single function
+# chains all steps in sequence, returns structured data for
+# verification, and allows individual steps to be extracted as the
+# pipeline grows.
 # ====================================================================
 
 
@@ -341,9 +338,9 @@ def run_etl() -> tuple[list[dict], dict]:
         stats["normalized"] += 1
 
         # Fix region via school match if region is wrong or missing.
-        # Rationale: Some CSV rows have an empty or misspelled region column
-        # but a valid school name. We can reconstruct the correct region by
-        # looking up the school in our known mapping.
+        # To reconstruct the correct region when CSV has empty or
+        # misspelled region values. If the school name is valid we
+        # look it up in the known mapping and correct the region.
         if not entry["region"] or entry["region"] not in REGION_MAP.values():
             matched_school, matched_region = match_school(rec.get("school", ""))
             if matched_region:
@@ -354,9 +351,9 @@ def run_etl() -> tuple[list[dict], dict]:
         cleaned.append(entry)
 
     # Step B: Remove records with invalid/missing critical fields.
-    # Rationale: A student record without a first or last name is
-    # useless for identification. Dropping these early reduces noise
-    # in downstream deduplication.
+    # To reduce noise in downstream deduplication. Records without a
+    # first or last name cannot identify a student, so dropping them
+    # early prevents wasted processing and false duplicate matches.
     valid: list[dict] = []
     for entry in cleaned:
         if not entry["first_name"] or not entry["last_name"]:
