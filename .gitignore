@@ -1,11 +1,18 @@
-﻿# To avoid committing machine-specific compiled files
-*.pyc
+﻿# Machine-specific and compiled artifacts
 __pycache__/
-# To keep diffs clean — regenerated on every test run
+*.pyc
 .pytest_cache/
 
-# To keep diffs readable — binary DOCX produces unreadable diffs
+# Documents and reports (kept local, not source code)
 *.docx
-# To avoid tracking single-use utilities — only needed to generate the logbook
-generate_logbook.py
+*.pdf
+
+# Images / screenshots (except the network topology deliverable)
+*.png
+
+# Sensitive personal data — never commit
+Payslip*.pdf
+
+# Single-use logbook generator utilities
+generate_logbook*.py
 setup_conflict.py
