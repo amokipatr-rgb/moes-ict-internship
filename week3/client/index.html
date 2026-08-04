@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ministry Client App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 40px 35px;
+            width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .card h2 {
+            color: #1f3864;
+            font-size: 22px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .card .sub {
+            color: #666;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .card label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .card input[type="text"],
+        .card input[type="email"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            outline: none;
+            margin-bottom: 16px;
+        }
+        .card input:focus {
+            border-color: #667eea;
+        }
+        .card button {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .card button:hover {
+            opacity: 0.9;
+        }
+        .card button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        #response {
+            margin-top: 18px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            min-height: 20px;
+        }
+        #response.success {
+            color: #28a745;
+        }
+        #response.error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Submit Data to Local Server</h2>
+        <p class="sub">Ministry of Education and Sports — ICT Internship</p>
+
+        <form id="userForm">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="Enter your name" required>
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="Enter your email" required>
+
+            <button type="submit" id="submitBtn">Send to Server</button>
+        </form>
+
+        <p id="response"></p>
+    </div>
+
+    <script>
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submitBtn');
+            const resp = document.getElementById('response');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            resp.className = '';
+            resp.textContent = '';
+
+            let formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('email', document.getElementById('email').value);
+
+            fetch('http://localhost/week3/api/server.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                resp.className = data.status === 'success' ? 'success' : 'error';
+                resp.textContent = data.message;
+            })
+            .catch(() => {
+                resp.className = 'error';
+                resp.textContent = 'Connection failed. Is the server running?';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Send to Server';
+            });
+        });
+    </script>
+
+</body>
+</html>
