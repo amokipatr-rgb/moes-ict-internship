@@ -1,0 +1,10 @@
+{
+  "total_raw": 8339,
+  "normalized": 8339,
+  "region_fixed": 0,
+  "gender_fixed": 10,
+  "dob_parsed": 8339,
+  "duplicates_removed": 25,
+  "invalid_removed": 0,
+  "final_count": 8314
+}
