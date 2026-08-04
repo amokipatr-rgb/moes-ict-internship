@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoES Store Inventory System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..200" rel="stylesheet">
+<style>
+:root {
+    --primary: #1e293b;
+    --primary-hover: #334155;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-light: #eff6ff;
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --border-focus: #3b82f6;
+    --text: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --success: #16a34a;
+    --success-bg: #dcfce7;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --info: #0284c7;
+    --info-bg: #e0f2fe;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,.06), 0 2px 4px -1px rgba(0,0,0,.04);
+    --shadow-lg: 0 10px 25px -3px rgba(0,0,0,.08), 0 4px 8px -4px rgba(0,0,0,.04);
+    --shadow-xl: 0 20px 50px -8px rgba(0,0,0,.12);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.5; }
+.sidebar { width: 260px; min-height: 100vh; background: var(--surface); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; z-index: 100; border-right: 1px solid var(--border); }
+.sidebar .logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+.sidebar .logo .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sidebar .logo .logo-icon span { font-size: 20px; color: #fff; }
+.sidebar .logo .logo-text h2 { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.02em; }
+.sidebar .logo .logo-text p { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+.sidebar .nav-section { padding: 12px 10px 4px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; padding-left: 24px; }
+.sidebar nav { flex: 1; padding: 8px 10px; display: flex; flex-direction: column; gap: 1px; }
+.sidebar nav a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: all .15s; cursor: pointer; border-radius: var(--radius); }
+.sidebar nav a:hover { background: var(--bg); color: var(--text); }
+.sidebar nav a.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.sidebar nav a .icon { font-size: 20px; width: 22px; text-align: center; color: var(--text-muted); flex-shrink: 0; }
+.sidebar nav a.active .icon { color: var(--accent); }
+.sidebar .footer { padding: 12px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-muted); }
+.main { margin-left: 260px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { background: var(--surface); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 60px; border-bottom: 1px solid var(--border); }
+.topbar h1 { font-size: 16px; color: var(--text); font-weight: 600; letter-spacing: -.01em; }
+.topbar .topbar-right { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 16px; }
+.topbar .topbar-right .badge { background: var(--bg); color: var(--text-secondary); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); }
+.content { padding: 28px 32px; flex: 1; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.card .num { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -.03em; line-height: 1; }
+.card .label { font-size: 13px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.card .num.warn { color: var(--danger); }
+.dashboard-section { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; border: 1px solid var(--border); margin-bottom: 16px; }
+.dashboard-section h3 { font-size: 13px; font-weight: 600; margin-bottom: 14px; color: var(--text); text-transform: uppercase; letter-spacing: .04em; }
+.dashboard-row { display: flex; gap: 16px; margin-bottom: 16px; }
+.dashboard-row .flex-2 { flex: 2; }
+.dashboard-row .flex-1 { flex: 1; }
+.status-overview { display: flex; flex-direction: column; gap: 14px; }
+.status-bar-item { display: flex; align-items: center; gap: 12px; }
+.status-bar-item .sbi-label { width: 90px; font-size: 13px; font-weight: 500; color: var(--text-secondary); flex-shrink: 0; }
+.status-bar-item .sbi-track { flex: 1; height: 10px; background: var(--bg); border-radius: 5px; overflow: hidden; }
+.status-bar-item .sbi-track .sbi-fill { height: 100%; border-radius: 5px; transition: width .6s ease; }
+.status-bar-item .sbi-val { width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; }
+.status-bar-item .sbi-pct { width: 40px; text-align: right; font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+.activity-list { display: flex; flex-direction: column; }
+.activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.activity-item:last-child { border-bottom: none; }
+.activity-item .ai-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+.activity-item .ai-icon.received { background: var(--success); }
+.activity-item .ai-icon.issued { background: var(--info); }
+.activity-item .ai-icon.returned { background: #d97706; }
+.activity-item .ai-icon.damaged { background: var(--danger); }
+.activity-item .ai-icon.disposed { background: var(--text-muted); }
+.activity-item .ai-icon.adjusted { background: var(--accent); }
+.activity-item .ai-body { flex: 1; min-width: 0; }
+.activity-item .ai-body .ai-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.activity-item .ai-body .ai-title small { font-weight: 400; color: var(--text-muted); }
+.activity-item .ai-body .ai-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.activity-item .ai-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+.quick-actions { display: flex; flex-direction: column; gap: 8px; }
+.qa-card { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--bg); border-radius: var(--radius); cursor: pointer; text-decoration: none; color: var(--text); transition: all .15s; border: 1px solid transparent; }
+.qa-card:hover { border-color: var(--accent); background: var(--accent-light); }
+.qa-card span:first-child { font-size: 22px; color: var(--accent); }
+.qa-card span:last-child { font-weight: 500; font-size: 13px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; background: var(--surface); padding: 12px 16px; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid var(--border); }
+.toolbar input, .toolbar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; outline: none; background: var(--surface); color: var(--text); transition: border-color .15s, box-shadow .15s; }
+.toolbar input:focus, .toolbar select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+.toolbar input { flex: 1; min-width: 180px; }
+.toolbar .spacer { flex: 1; }
+.filter-btns { display: flex; gap: 4px; }
+.filter-btns .btn { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+.filter-btns .btn.active { background: var(--primary); color: #fff; }
+.btn { padding: 8px 16px; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .12s; display: inline-flex; align-items: center; gap: 6px; line-height: 1.4; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #15803d; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover { background: #b45309; }
+.btn-info { background: var(--info); color: #fff; }
+.btn-info:hover { background: #0369a1; }
+.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg); }
+.table-wrap { background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { position: sticky; top: 0; z-index: 10; }
+thead th { padding: 10px 14px; text-align: left; font-weight: 600; color: var(--text-secondary); background: #f8fafc; border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #f8fafc; }
+.status-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; letter-spacing: .02em; }
+.status-In\ Store { background: var(--success-bg); color: #15803d; }
+.status-Issued { background: var(--info-bg); color: #0369a1; }
+.status-Damaged { background: var(--danger-bg); color: #b91c1c; }
+.status-Disposed { background: #f1f5f9; color: #475569; }
+.status-Under\ Repair { background: var(--warning-bg); color: #92400e; }
+.pagination { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8fafc; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-secondary); }
+.pagination button { background: var(--surface); border: 1px solid var(--border); padding: 6px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13px; transition: all .1s; }
+.pagination button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.pagination button:disabled { opacity: .4; cursor: default; }
+.empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+.empty-state h3 { font-size: 15px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 500; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 1000; justify-content: center; align-items: center; }
+.modal-overlay.active { display: flex; }
+.modal { background: var(--surface); border-radius: var(--radius-lg); width: 720px; max-width: 95vw; max-height: 85vh; overflow-y: auto; padding: 28px; box-shadow: var(--shadow-xl); animation: modalIn .18s ease; border: 1px solid var(--border); }
+@keyframes modalIn { from { opacity: 0; transform: scale(.97) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.modal h2 { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid .full { grid-column: 1 / -1; }
+.form-grid label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+.form-grid input, .form-grid select, .form-grid textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; outline: none; font-family: inherit; background: var(--surface); color: var(--text); transition: border-color .15s, box-shadow .15s; }
+.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+.form-grid textarea { resize: vertical; min-height: 60px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+.modal-actions .btn { min-width: 80px; }
+.item-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+.item-row input, .item-row select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; outline: none; }
+.item-row input:focus, .item-row select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 2px rgba(59,130,246,.1); }
+.item-row .btn-remove { background: var(--danger-bg); color: var(--danger); border: none; border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all .12s; flex-shrink: 0; }
+.item-row .btn-remove:hover { background: var(--danger); color: #fff; }
+.check-group { display: flex; gap: 16px; flex-wrap: wrap; }
+.check-group label { font-size: 13px; font-weight: 400; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text); }
+.asset-select-list { max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); padding: 4px; background: var(--surface); }
+.asset-select-list label { display: flex; align-items: center; gap: 8px; padding: 7px 8px; font-size: 13px; font-weight: 400; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .08s; }
+.asset-select-list label:hover { background: #f8fafc; }
+.asset-select-list label:last-child { border-bottom: none; }
+.asset-select-list .sel-all { font-size: 13px; font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--border); margin-bottom: 2px; display: flex; align-items: center; gap: 8px; color: var(--text); }
+.timeline { position: relative; padding-left: 28px; }
+.timeline::before { content: ''; position: absolute; left: 10px; top: 6px; bottom: 6px; width: 1.5px; background: var(--border); }
+.tl-item { position: relative; padding: 12px 0 12px 20px; border-bottom: 1px solid var(--border); }
+.tl-item:last-child { border-bottom: none; }
+.tl-item::before { content: ''; position: absolute; left: -23px; top: 16px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--accent); background: var(--surface); }
+.tl-item.received::before { border-color: var(--success); background: var(--success-bg); }
+.tl-item.issued::before { border-color: var(--info); background: var(--info-bg); }
+.tl-item.returned::before { border-color: var(--warning); background: var(--warning-bg); }
+.tl-item.damaged::before { border-color: var(--danger); background: var(--danger-bg); }
+.tl-item.disposed::before { border-color: var(--text-muted); background: #f1f5f9; }
+.tl-item .tl-date { font-size: 11px; color: var(--text-muted); }
+.tl-item .tl-type { font-weight: 600; font-size: 13px; color: var(--text); }
+.tl-item .tl-detail { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: var(--radius); color: #fff; font-weight: 500; font-size: 14px; box-shadow: var(--shadow-lg); z-index: 2000; opacity: 0; transition: all .25s; transform: translateY(8px); }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }
+@media print {
+    .sidebar, .topbar, .toolbar, .btn, .modal-actions, .no-print { display: none !important; }
+    .main { margin-left: 0 !important; }
+    .content { padding: 0 !important; }
+    .tab-pane { display: none !important; }
+    .tab-pane.active { display: block !important; }
+    .modal-overlay { position: static !important; background: none !important; display: block !important; }
+    .modal-overlay.active { display: block !important; }
+    .modal { box-shadow: none !important; border: none !important; padding: 0 !important; max-height: none !important; width: 100% !important; animation: none !important; }
+    .gr-preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px; }
+    .gr-preview-header .gr-title { font-size: 18px; font-weight: 700; }
+    .gr-preview-header .gr-meta { font-size: 12px; color: #555; }
+    table { font-size: 11px; }
+    thead th { background: #1e293b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .status-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    @page { margin: 15mm; }
+}
+@media (max-width: 768px) {
+    .sidebar { width: 60px; }
+    .sidebar .logo { padding: 14px; justify-content: center; }
+    .sidebar .logo .logo-text, .sidebar .nav-section, .sidebar nav a span, .sidebar .footer { display: none; }
+    .sidebar nav a { justify-content: center; padding: 10px; }
+    .sidebar nav { gap: 2px; }
+    .main { margin-left: 60px; }
+    .toolbar { flex-direction: column; }
+    .content { padding: 16px; }
+    .dashboard-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">inventory</span></div>
+        <div class="logo-text">
+            <h2>MoES SIS</h2>
+            <p>Store Inventory System</p>
+        </div>
+    </div>
+    <div class="nav-section">Main Menu</div>
+    <nav id="sidebarNav">
+        <a class="active" data-tab="dashboard"><span class="icon material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+        <a data-tab="stock"><span class="icon material-symbols-outlined">inventory</span><span>Stock</span></a>
+        <a data-tab="assets"><span class="icon material-symbols-outlined">inventory_2</span><span>Assets</span></a>
+        <a data-tab="goods-received"><span class="icon material-symbols-outlined">move_to_inbox</span><span>Goods Received</span></a>
+        <a data-tab="goods-issued"><span class="icon material-symbols-outlined">output</span><span>Goods Issued</span></a>
+        <a data-tab="movements"><span class="icon material-symbols-outlined">swap_horiz</span><span>Movements</span></a>
+        <a data-tab="reports"><span class="icon material-symbols-outlined">description</span><span>Reports</span></a>
+    </nav>
+    <div class="footer">MoES ICT Dept &copy; 2026</div>
+</aside>
+
+<div class="main">
+    <div class="topbar">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="topbar-right">
+            <span class="badge">Stores</span>
+            <span id="clock"></span>
+        </div>
+    </div>
+    <div class="content">
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="tab-dashboard" class="tab-pane active">
+    <div class="cards" id="statCards"></div>
+    <div class="dashboard-section">
+        <h3>Today's Activity</h3>
+        <div class="status-overview" id="statusOverview"></div>
+    </div>
+    <div class="dashboard-row">
+        <div class="dashboard-section flex-2">
+            <h3>Recent Activity</h3>
+            <div class="activity-list" id="activityList">
+                <div class="empty-state"><h3>No recent activity</h3></div>
+            </div>
+        </div>
+        <div class="dashboard-section flex-1">
+            <h3>Quick Actions</h3>
+            <div class="quick-actions">
+                <a class="qa-card" onclick="showTab('goods-received')">
+                    <span class="material-symbols-outlined">move_to_inbox</span>
+                    <span>Record GR</span>
+                </a>
+                <a class="qa-card" onclick="showTab('goods-issued')">
+                    <span class="material-symbols-outlined">output</span>
+                    <span>Issue Goods</span>
+                </a>
+                <a class="qa-card" onclick="showTab('reports')">
+                    <span class="material-symbols-outlined">description</span>
+                    <span>Generate Report</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ STOCK ═══ -->
+<div id="tab-stock" class="tab-pane">
+    <div class="toolbar">
+        <input type="text" id="stockSearch" placeholder="Search item code, serial, category..." oninput="loadStock()">
+        <select id="stockFilterCategory" onchange="loadStock()"><option value="">All Categories</option></select>
+        <select id="stockFilterSource" onchange="loadStock()"><option value="">All Sources</option><option>received</option><option>manual</option></select>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openStockModal()">+ Add Stock Item</button>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Code</th><th>Serial No</th><th>Category</th><th>Make/Model</th><th>Source</th><th>GR Ref</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="stockBody"></tbody>
+        </table>
+        <div class="pagination">
+            <span id="stockPageInfo">0 items</span>
+            <div>
+                <button id="stockPrevPage" onclick="stockPrevPage()" disabled>&#8592; Prev</button>
+                <button id="stockNextPage" onclick="stockNextPage()" disabled>Next &#8594;</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ ASSETS ═══ -->
+<div id="tab-assets" class="tab-pane">
+    <div class="toolbar">
+        <input type="text" id="assetSearch" placeholder="Search asset tag, serial, person..." oninput="loadAssets()">
+        <div class="filter-btns">
+            <button class="btn btn-sm btn-primary active" onclick="setAssetFilter('','All Assets')">All</button>
+            <button class="btn btn-sm btn-info" onclick="setAssetFilter('Issued','Issued')">Issued</button>
+            <button class="btn btn-sm btn-danger" onclick="setAssetFilter('Damaged','Damaged')">Damaged</button>
+            <button class="btn btn-sm btn-warning" onclick="setAssetFilter('Under Repair','Under Repair')">Under Repair</button>
+        </div>
+        <select id="assetFilterCategory" onchange="loadAssets()"><option value="">All Categories</option></select>
+        <select id="assetFilterLocation" onchange="loadAssets()"><option value="">All Locations</option></select>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openAssetModal()">+ Add</button>
+        <button class="btn btn-success" onclick="exportCSV()">CSV Export</button>
+        <button class="btn btn-danger" onclick="downloadPDF()">PDF</button>
+        <button class="btn btn-warning" onclick="document.getElementById('csvFile').click()">Import</button>
+        <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="importCSV(this.files[0])">
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset Tag</th><th>Category</th><th>Make/Model</th><th>Serial No</th><th>Location</th>
+                    <th>Assigned To</th><th>Department</th><th>Status</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="assetBody"></tbody>
+        </table>
+        <div class="pagination">
+            <span id="assetPageInfo">0 assets</span>
+            <div>
+                <button id="assetPrevPage" onclick="assetPrevPage()" disabled>&#8592; Prev</button>
+                <button id="assetNextPage" onclick="assetNextPage()" disabled>Next &#8594;</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ GOODS RECEIVED ═══ -->
+<div id="tab-goods-received" class="tab-pane">
+    <div class="toolbar">
+        <input type="text" id="grSearch" placeholder="Search LPO, supplier..." oninput="loadGR()">
+        <button class="btn btn-primary" onclick="openGRModal()">+ Record Goods Received</button>
+    </div>
+    <div class="table-wrap">
+        <table><thead><tr><th>ID</th><th>Supplier</th><th>LPO No.</th><th>Delivery Date</th><th>Items</th><th>Docs</th><th>Received By</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="grBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══ GOODS ISSUED ═══ -->
+<div id="tab-goods-issued" class="tab-pane">
+    <div class="toolbar">
+        <input type="text" id="giSearch" placeholder="Search department, officer..." oninput="loadGI()">
+        <button class="btn btn-primary" onclick="openGIModal()">+ Issue Goods</button>
+    </div>
+    <div class="table-wrap">
+        <table><thead><tr><th>ID</th><th>Department</th><th>Officer</th><th>Issue Date</th><th>Items</th><th>Issued By</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="giBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══ MOVEMENTS ═══ -->
+<div id="tab-movements" class="tab-pane">
+    <div class="toolbar">
+        <input type="text" id="movSearch" placeholder="Search item code, serial..." oninput="loadMovements()">
+        <select id="movItemType" onchange="loadMovements()">
+            <option value="">All Types</option>
+            <option value="stock">Stock</option><option value="asset">Asset</option>
+        </select>
+        <select id="movType" onchange="loadMovements()">
+            <option value="">All Movements</option>
+            <option>Received</option><option>Issued</option><option>Returned</option>
+            <option>Transferred</option><option>Damaged</option><option>Repaired</option><option>Disposed</option><option>Adjusted</option>
+        </select>
+        <input type="date" id="movFrom" onchange="loadMovements()">
+        <span style="color:#888">to</span>
+        <input type="date" id="movTo" onchange="loadMovements()">
+        <div class="spacer"></div>
+        <button class="btn btn-success" onclick="exportMovCSV()">CSV</button>
+    </div>
+    <div class="table-wrap">
+        <table><thead><tr><th>Date</th><th>Item</th><th>Item Type</th><th>Movement Type</th><th>From</th><th>To</th><th>Reference</th><th>Changed By</th></tr></thead>
+            <tbody id="movBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══ REPORTS ═══ -->
+<div id="tab-reports" class="tab-pane">
+    <div class="toolbar" style="flex-wrap:wrap">
+        <select id="rptType" style="min-width:200px">
+            <option value="assets">Asset Register</option>
+            <option value="stock">Stock Report</option>
+            <option value="gr">Goods Received</option>
+            <option value="gi">Goods Issued</option>
+            <option value="movements">Stock Movements</option>
+            <option value="damaged">Damaged / Disposed</option>
+        </select>
+        <input type="date" id="rptFrom">
+        <span style="color:#888">to</span>
+        <input type="date" id="rptTo">
+        <select id="rptCategory" style="display:none"><option value="">All Categories</option></select>
+        <select id="rptStatus" style="display:none"><option value="">All Statuses</option>
+            <option>Issued</option><option>Damaged</option><option>Disposed</option><option>Under Repair</option><option>Returned</option>
+        </select>
+        <select id="rptDept" style="display:none"><option value="">All Departments</option></select>
+        <select id="rptMovType" style="display:none"><option value="">All Movement Types</option>
+            <option>Received</option><option>Issued</option><option>Returned</option>
+            <option>Transferred</option><option>Damaged</option><option>Repaired</option><option>Disposed</option><option>Adjusted</option>
+        </select>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="previewReport()">Preview</button>
+        <button class="btn btn-success" onclick="exportReportPDF()">PDF</button>
+        <button class="btn btn-warning" onclick="exportReportCSV()">CSV</button>
+    </div>
+    <div class="table-wrap">
+        <div id="rptSummary" style="padding:14px 18px;background:#f7f8fa;border-bottom:1px solid #e0e0e0;font-size:14px;color:#555"></div>
+        <table><thead id="rptHead"></thead><tbody id="rptBody"></tbody></table>
+    </div>
+</div>
+
+</div></div>
+
+<!-- ═══ MODAL: STOCK ═══ -->
+<div class="modal-overlay" id="modal-stock">
+    <div class="modal">
+        <h2 id="stockModalTitle">Add Stock Item</h2>
+        <div class="form-grid">
+            <div class="full"><label>Item Code *</label><input type="text" id="f-stock-item_code" placeholder="e.g. ITM-001"></div>
+            <div><label>Serial No</label><input type="text" id="f-stock-serial_no" placeholder="Serial number"></div>
+            <div><label>Category *</label>
+                <select id="f-stock-category">
+                    <option value="">-- Select --</option>
+                    <option>System Unit</option><option>Monitor</option><option>Laptop</option>
+                    <option>Printer</option><option>UPS</option><option>Scanner</option>
+                    <option>Network Switch</option><option>Router</option><option>Keyboard & Mouse</option>
+                    <option>External HDD</option><option>Projector</option><option>Photocopier</option><option>Other</option>
+                </select>
+            </div>
+            <div class="full"><label>Make / Model</label><input type="text" id="f-stock-make_model" placeholder="e.g. Dell Optiplex 3080"></div>
+            <div class="full"><label>Description</label><textarea id="f-stock-description" placeholder="Item description"></textarea></div>
+            <div class="full"><label>Notes</label><textarea id="f-stock-notes" placeholder="Additional notes..."></textarea></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal('modal-stock')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveStock()">Save Item</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: ASSET ═══ -->
+<div class="modal-overlay" id="modal-asset">
+    <div class="modal">
+        <h2 id="assetModalTitle">Add Asset</h2>
+        <div class="form-grid">
+            <div class="full"><label>Asset Tag *</label><input type="text" id="f-asset_tag" placeholder="e.g. MES/HQT/21/EPPAD/0569"></div>
+            <div><label>Category *</label>
+                <select id="f-category">
+                    <option value="">-- Select --</option>
+                    <option>System Unit</option><option>Monitor</option><option>Laptop</option>
+                    <option>Printer</option><option>UPS</option><option>Scanner</option>
+                    <option>Network Switch</option><option>Router</option><option>Keyboard & Mouse</option>
+                    <option>External HDD</option><option>Projector</option><option>Photocopier</option><option>Other</option>
+                </select>
+            </div>
+            <div><label>Status</label><select id="f-status"><option>Issued</option><option>Damaged</option><option>Disposed</option><option>Under Repair</option><option>Returned</option></select></div>
+            <div><label>Serial No</label><input type="text" id="f-serial_no" placeholder="Serial number"></div>
+            <div><label>Make / Model</label><input type="text" id="f-make_model" placeholder="e.g. Dell Optiplex 3080"></div>
+            <div><label>Location *</label>
+                <select id="f-location">
+                    <option value="">-- Select --</option>
+                    <option>Stores</option><option>Floor 1</option><option>Floor 2</option><option>Floor 3</option>
+                    <option>Floor 4</option><option>Floor 5</option><option>Floor 6</option><option>Floor 7</option><option>Floor 8</option>
+                </select>
+            </div>
+            <div><label>Room No</label><input type="text" id="f-room_no" placeholder="e.g. Rm 6.11"></div>
+            <div><label>Department</label><input type="text" id="f-department" placeholder="e.g. Education Planning"></div>
+            <div><label>Assigned To</label><input type="text" id="f-assigned_to" placeholder="Staff name"></div>
+            <div class="full"><label>Notes</label><textarea id="f-notes" placeholder="Damages, issues, or remarks..."></textarea></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal('modal-asset')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAsset()" id="saveAssetBtn">Save Asset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: GOODS RECEIVED ═══ -->
+<div class="modal-overlay" id="modal-gr">
+    <div class="modal">
+        <h2>Record Goods Received</h2>
+        <div class="form-grid">
+            <div class="full"><label>Supplier *</label><input type="text" id="f-gr-supplier_name" placeholder="Supplier name"></div>
+            <div><label>LPO Number *</label><input type="text" id="f-gr-lpo" placeholder="LPO/MoES/2026/..."></div>
+            <div><label>Delivery Date *</label><input type="date" id="f-gr-date"></div>
+            <div><label>Received By</label><input type="text" id="f-gr-received-by" placeholder="Store Keeper" value="Kisakye Betty"></div>
+            <div class="full"><label>Procuring Dept</label><input type="text" id="f-gr-proc" value="Procurement Unit"></div>
+            <div class="full"><label>Documents</label>
+                <div class="check-group">
+                    <label><input type="checkbox" id="f-gr-invoice" checked> Invoice</label>
+                    <label><input type="checkbox" id="f-gr-lpo-doc" checked> LPO</label>
+                    <label><input type="checkbox" id="f-gr-dn" checked> Delivery Note</label>
+                </div>
+            </div>
+            <div class="full"><label>Notes</label><textarea id="f-gr-notes"></textarea></div>
+            <div class="full"><h3 style="font-size:15px;color:#1a3a5c;">Items Received</h3></div>
+            <div class="full" id="gr-items-container"></div>
+            <div class="full"><button class="btn btn-info btn-sm" onclick="addGRItem()">+ Add Item</button></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal('modal-gr')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveGR()">Record</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: GOODS ISSUED ═══ -->
+<div class="modal-overlay" id="modal-gi">
+    <div class="modal">
+        <h2>Issue Goods to Department</h2>
+        <div class="form-grid">
+            <div><label>Department *</label><select id="f-gi-dept"><option value="">-- Select --</option></select></div>
+            <div><label>Issue Date *</label><input type="date" id="f-gi-date"></div>
+            <div><label>Officer Name *</label><input type="text" id="f-gi-officer" placeholder="Recipient name"></div>
+            <div><label>Officer Title</label><input type="text" id="f-gi-title" placeholder="e.g. HOD ICT"></div>
+            <div><label>Issued By</label><input type="text" id="f-gi-issued-by" value="Kisakye Betty"></div>
+            <div class="full"><label>Notes</label><textarea id="f-gi-notes"></textarea></div>
+            <div class="full"><h3 style="font-size:15px;color:#1a3a5c;">Select Stock Items to Issue</h3></div>
+            <div class="full"><input type="text" id="gi-search-asset" placeholder="Search..." oninput="renderStockSelectList()">
+                <label style="font-size:13px;margin-left:8px"><input type="checkbox" id="gi-select-all" onchange="toggleSelectAll()"> Select All</label>
+            </div>
+            <div class="full asset-select-list" id="gi-stock-list"><p>Loading...</p></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal('modal-gi')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveGI()">Issue Goods</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: MOVEMENT HISTORY ═══ -->
+<div class="modal-overlay" id="modal-movements">
+    <div class="modal" style="width:640px">
+        <h2 id="movModalTitle">Asset Movements</h2>
+        <div class="timeline" id="movTimeline"></div>
+        <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-movements')">Close</button></div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: RETURN TO STORE ═══ -->
+<div class="modal-overlay" id="modal-return">
+    <div class="modal" style="width:600px">
+        <h2>Return Assets to Store</h2>
+        <p style="margin-bottom:12px;color:#666">Select assets issued to <strong id="returnDeptName"></strong> to return to store.</p>
+        <div class="asset-select-list" id="returnAssetList"></div>
+        <div class="full" style="margin-top:12px"><label>Notes</label><textarea id="f-return-notes" placeholder="Reason for return..."></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal('modal-return')">Cancel</button>
+            <button class="btn btn-warning" onclick="saveReturn()">Return to Store</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost/week_seven_task/api/server.php';
+const PAGE_TITLES = { dashboard:'Dashboard', stock:'Stock Inventory', assets:'Deployed Assets', 'goods-received':'Goods Received', 'goods-issued':'Goods Issued', movements:'Stock Movements', reports:'Reports' };
+
+let stockItems = [], stockPage = 1, STOCK_PER_PAGE = 25;
+let assets = [], assetPage = 1, ASSET_PER_PAGE = 25;
+let editAssetId = null, editStockId = null;
+let departments = [], availableStockItems = [];
+let currentAssetFilter = '';
+
+function updateClock() {
+    document.getElementById('clock').textContent = new Date().toLocaleString('en-UG', { timeZone:'Africa/Nairobi', hour12:true });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function showTab(name) {
+    document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(d => d.classList.remove('active'));
+    const link = document.querySelector(`.sidebar nav a[data-tab="${name}"]`);
+    if (link) link.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('pageTitle').textContent = PAGE_TITLES[name] || name;
+    if (name === 'dashboard') loadDashboard();
+    if (name === 'stock') loadStock();
+    if (name === 'assets') loadAssets();
+    if (name === 'goods-received') loadGR();
+    if (name === 'goods-issued') loadGI();
+    if (name === 'movements') loadMovements();
+}
+document.getElementById('sidebarNav').addEventListener('click', function(e) {
+    const a = e.target.closest('a');
+    if (a && a.dataset.tab) { e.preventDefault(); showTab(a.dataset.tab); }
+});
+
+function fmtDate(d) { if (!d) return ''; try { return new Date(d).toLocaleDateString('en-UG',{day:'2-digit',month:'short',year:'numeric'}); } catch(e) { return d; } }
+
+// ── Dashboard ──
+async function loadDashboard() {
+    try {
+        const res = await fetch(`${API}/stats`); const d = await res.json();
+        const damaged = d.damaged || d.needs_attention || 0;
+        document.getElementById('statCards').innerHTML = `
+            <div class="card"><div class="num">${d.total_assets||0}</div><div class="label">Assets</div></div>
+            <div class="card"><div class="num">${d.in_store||0}</div><div class="label">In Store</div></div>
+            <div class="card"><div class="num ${damaged > 0 ? 'warn' : ''}">${damaged}</div><div class="label">Damaged</div></div>
+            <div class="card"><div class="num">${d.total_movements||0}</div><div class="label">Movements</div></div>
+            <div class="card"><div class="num">${d.today_issued||0}</div><div class="label">Today's Issued</div></div>`;
+        const today = d.today || {};
+        const todayTotal = Object.values(today).reduce((a,b) => a + b, 0) || 1;
+        const todayColors = { Received:'var(--success)', Issued:'var(--info)', Returned:'var(--warning)', Damaged:'var(--danger)', Disposed:'var(--text-muted)', Adjusted:'var(--accent)' };
+        document.getElementById('statusOverview').innerHTML = ['Received','Issued','Returned','Damaged'].filter(t => t in today).map(t =>
+            `<div class="status-bar-item"><span class="sbi-label">${t}</span><div class="sbi-track"><div class="sbi-fill" style="width:${(today[t]/todayTotal)*100}%;background:${todayColors[t]||'var(--info)'}"></div></div><span class="sbi-val">${today[t]}</span><span class="sbi-pct">${Math.round((today[t]/todayTotal)*100)}%</span></div>`
+        ).join('') || '<div style="color:#999;padding:8px 0">No activity today</div>';
+        try {
+            const a = await fetch(`${API}/all_movements?limit=10`); const ad = await a.json();
+            const mv = ad.data || [];
+            document.getElementById('activityList').innerHTML = mv.length ? mv.map(m => {
+                const t = (m.movement_type||'').toLowerCase();
+                const icons = { received:'move_to_inbox', issued:'output', returned:'undo', damaged:'warning', disposed:'delete', adjusted:'tune' };
+                const label = m.item_code || m.asset_tag || '';
+                return `<div class="activity-item"><div class="ai-icon ${t}"><span class="material-symbols-outlined" style="font-size:16px">${icons[t]||'swap_horiz'}</span></div><div class="ai-body"><div class="ai-title">${esc(label)} <small>${esc(m.movement_type)}</small></div><div class="ai-meta">${esc(m.notes||m.reference||'—')}</div></div><div class="ai-date">${fmtDate(m.created_at)}</div></div>`;
+            }).join('') : '<div class="empty-state"><h3>No recent activity</h3></div>';
+        } catch(e) { document.getElementById('activityList').innerHTML = '<div class="empty-state"><h3>Could not load activity</h3></div>'; }
+    } catch (e) { showToast('Failed to load dashboard', 'error'); }
+}
+
+// ── Stock ──
+async function loadStock() {
+    const search = document.getElementById('stockSearch').value;
+    const cat = document.getElementById('stockFilterCategory').value;
+    const source = document.getElementById('stockFilterSource').value;
+    const params = new URLSearchParams({ search, category: cat, source, sort:'item_code', order:'ASC' });
+    try {
+        const res = await fetch(`${API}/stock?${params}`); const d = await res.json();
+        stockItems = d.data || []; stockPage = 1;
+        renderStockTable();
+    } catch (e) { showToast('Failed to load stock','error'); }
+}
+function renderStockTable() {
+    const start = (stockPage - 1) * STOCK_PER_PAGE;
+    const page = stockItems.slice(start, start + STOCK_PER_PAGE);
+    const tbody = document.getElementById('stockBody');
+    if (!page.length) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><h3>No stock items found</h3></div></td></tr>`;
+    } else {
+        tbody.innerHTML = page.map(s => `<tr>
+            <td><strong>${esc(s.item_code)}</strong></td>
+            <td>${esc(s.serial_no)||'-'}</td>
+            <td>${esc(s.category)}</td>
+            <td>${esc(s.make_model)||'-'}</td>
+            <td><span class="status-badge">${esc(s.source)}</span></td>
+            <td>${s.gr_reference ? esc(s.gr_reference) : '-'}</td>
+            <td class="actions">
+                <button class="btn btn-danger btn-sm" onclick="deleteStock(${s.id})">Delete</button>
+            </td>
+        </tr>`).join('');
+    }
+    document.getElementById('stockPageInfo').textContent = `${stockItems.length} items (page ${stockPage} of ${Math.ceil(stockItems.length/STOCK_PER_PAGE)||1})`;
+    document.getElementById('stockPrevPage').disabled = stockPage <= 1;
+    document.getElementById('stockNextPage').disabled = start + STOCK_PER_PAGE >= stockItems.length;
+}
+function stockPrevPage() { stockPage--; renderStockTable(); }
+function stockNextPage() { stockPage++; renderStockTable(); }
+function openStockModal() {
+    editStockId = null;
+    document.getElementById('stockModalTitle').textContent = 'Add Stock Item';
+    ['f-stock-item_code','f-stock-serial_no','f-stock-category','f-stock-make_model','f-stock-description','f-stock-notes'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('modal-stock').classList.add('active');
+}
+async function saveStock() {
+    const data = {
+        item_code: document.getElementById('f-stock-item_code').value.trim(),
+        serial_no: document.getElementById('f-stock-serial_no').value.trim(),
+        category: document.getElementById('f-stock-category').value,
+        make_model: document.getElementById('f-stock-make_model').value.trim(),
+        description: document.getElementById('f-stock-description').value.trim(),
+        notes: document.getElementById('f-stock-notes').value.trim()
+    };
+    if (!data.item_code || !data.category) { showToast('Item Code and Category are required','error'); return; }
+    try {
+        const res = await fetch(`${API}/stock`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+        const r = await res.json();
+        if (res.ok) { showToast('Stock item added','success'); closeModal('modal-stock'); loadStock(); } else { showToast(r.error||'Failed','error'); }
+    } catch (e) { showToast('Server connection failed','error'); }
+}
+async function deleteStock(id) {
+    if (!confirm('Delete this stock item? This can only be done if it has not been issued.')) return;
+    try {
+        const res = await fetch(`${API}/stock/${id}`, { method:'DELETE' });
+        if (res.ok) { showToast('Deleted','success'); loadStock(); } else { const r = await res.json(); showToast(r.error||'Failed','error'); }
+    } catch (e) { showToast('Server connection failed','error'); }
+}
+
+// ── Asset Filter Buttons ──
+function setAssetFilter(status, label) {
+    currentAssetFilter = status;
+    document.querySelectorAll('.filter-btns .btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    loadAssets();
+}
+
+// ── Assets ──
+async function loadAssets() {
+    const search = document.getElementById('assetSearch').value;
+    const cat = document.getElementById('assetFilterCategory').value;
+    const loc = document.getElementById('assetFilterLocation').value;
+    const params = new URLSearchParams({ search, category: cat, location: loc, sort:'asset_tag', order:'ASC' });
+    if (currentAssetFilter) params.set('status', currentAssetFilter);
+    try {
+        const res = await fetch(`${API}/assets?${params}`); const d = await res.json();
+        assets = d.data || []; assetPage = 1;
+        renderAssetTable();
+    } catch (e) { showToast('Failed to load assets','error'); }
+}
+function renderAssetTable() {
+    const start = (assetPage - 1) * ASSET_PER_PAGE;
+    const page = assets.slice(start, start + ASSET_PER_PAGE);
+    const tbody = document.getElementById('assetBody');
+    if (!page.length) {
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><h3>No assets found</h3></div></td></tr>`;
+    } else {
+        tbody.innerHTML = page.map(a => `<tr>
+            <td><strong>${esc(a.asset_tag)}</strong></td>
+            <td>${esc(a.category)}</td>
+            <td>${esc(a.make_model)||'-'}</td>
+            <td>${esc(a.serial_no)||'-'}</td>
+            <td>${esc(a.location)}${a.room_no ? ' ('+esc(a.room_no)+')' : ''}</td>
+            <td>${esc(a.assigned_to)||'-'}</td>
+            <td>${esc(a.department)||'-'}</td>
+            <td><span class="status-badge status-${esc(a.status.replace(/\s/g,'_'))} status-${esc(a.status)}">${esc(a.status)}</span></td>
+            <td class="actions">
+                <button class="btn btn-primary btn-sm" onclick="openAssetModal(${a.id})">Edit</button>
+                <button class="btn btn-info btn-sm" onclick="viewMovements(${a.id})">Moves</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteAsset(${a.id})">Del</button>
+            </td>
+        </tr>`).join('');
+    }
+    document.getElementById('assetPageInfo').textContent = `${assets.length} assets (page ${assetPage} of ${Math.ceil(assets.length/ASSET_PER_PAGE)||1})`;
+    document.getElementById('assetPrevPage').disabled = assetPage <= 1;
+    document.getElementById('assetNextPage').disabled = start + ASSET_PER_PAGE >= assets.length;
+}
+function assetPrevPage() { assetPage--; renderAssetTable(); }
+function assetNextPage() { assetPage++; renderAssetTable(); }
+function openAssetModal(id) {
+    editAssetId = id || null;
+    document.getElementById('assetModalTitle').textContent = id ? 'Edit Asset' : 'Add Asset';
+    document.getElementById('saveAssetBtn').textContent = id ? 'Update' : 'Save Asset';
+    ['f-asset_tag','f-serial_no','f-category','f-make_model','f-location','f-room_no','f-assigned_to','f-department','f-notes'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('f-status').value = 'Issued';
+    if (id) { const a = assets.find(x => x.id === id); if (a) { Object.entries({asset_tag:'f-asset_tag',serial_no:'f-serial_no',category:'f-category',make_model:'f-make_model',location:'f-location',room_no:'f-room_no',assigned_to:'f-assigned_to',department:'f-department',status:'f-status',notes:'f-notes'}).forEach(([k,v]) => document.getElementById(v).value = a[k] || ''); } }
+    document.getElementById('modal-asset').classList.add('active');
+}
+async function saveAsset() {
+    const data = { asset_tag:document.getElementById('f-asset_tag').value.trim(), serial_no:document.getElementById('f-serial_no').value.trim(), category:document.getElementById('f-category').value, make_model:document.getElementById('f-make_model').value.trim(), location:document.getElementById('f-location').value, room_no:document.getElementById('f-room_no').value.trim(), assigned_to:document.getElementById('f-assigned_to').value.trim(), department:document.getElementById('f-department').value.trim(), status:document.getElementById('f-status').value, notes:document.getElementById('f-notes').value.trim() };
+    if (!data.asset_tag || !data.category || !data.location) { showToast('Asset Tag, Category, and Location are required','error'); return; }
+    try {
+        let res; const opts = { headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) };
+        if (editAssetId) { res = await fetch(`${API}/assets/${editAssetId}`, {...opts, method:'PUT'}); } else { res = await fetch(`${API}/assets`, {...opts, method:'POST'}); }
+        const r = await res.json();
+        if (res.ok) { showToast(editAssetId ? 'Asset updated' : 'Asset created','success'); closeModal('modal-asset'); loadAssets(); loadDashboard(); }
+        else { showToast(r.error || 'Failed','error'); }
+    } catch (e) { showToast('Server connection failed','error'); }
+}
+async function deleteAsset(id) {
+    if (!confirm('Delete this asset?')) return;
+    try { const res = await fetch(`${API}/assets/${id}`,{method:'DELETE'}); if (res.ok) { showToast('Deleted','success'); loadAssets(); loadDashboard(); } else { const r = await res.json(); showToast(r.error||'Failed','error'); } } catch (e) { showToast('Server connection failed','error'); }
+}
+
+// ── Movement Timeline ──
+async function viewMovements(id) {
+    try {
+        const res = await fetch(`${API}/movements/${id}`); const d = await res.json();
+        const a = assets.find(x => x.id === id);
+        const title = a ? `Movements: ${a.asset_tag}` : `Asset #${id}`;
+        document.getElementById('movModalTitle').textContent = title;
+        const tl = document.getElementById('movTimeline');
+        if (!d.data || !d.data.length) { tl.innerHTML = '<p style="color:#999;padding:20px">No movements recorded for this asset.</p>'; }
+        else {
+            tl.innerHTML = d.data.map(m =>
+                `<div class="tl-item ${(m.movement_type||'').toLowerCase()}">
+                    <div class="tl-date">${m.created_at}</div>
+                    <div class="tl-type">${esc(m.movement_type)}</div>
+                    <div class="tl-detail">${m.from_status||m.from_location||'-'} → ${m.to_status||m.to_location||'-'} ${m.notes ? '— '+esc(m.notes) : ''}</div>
+                </div>`
+            ).join('');
+        }
+        document.getElementById('modal-movements').classList.add('active');
+    } catch (e) { showToast('Failed to load movements','error'); }
+}
+
+// ── Goods Received ──
+async function loadGR() {
+    try { const s = document.getElementById('grSearch').value; const res = await fetch(`${API}/goods_received?search=${encodeURIComponent(s)}`); const d = await res.json();
+        document.getElementById('grBody').innerHTML = !d.data || !d.data.length ? `<tr><td colspan="9"><div class="empty-state"><h3>No goods received</h3></div></td></tr>`
+            : d.data.map(gr => `<tr><td>#${gr.id}</td><td><strong>${esc(gr.supplier_name)}</strong></td><td>${esc(gr.lpo_number)}</td><td>${gr.delivery_date}</td><td>${gr.items_count||0} items</td><td>${gr.has_invoice?'I':''}${gr.has_lpo?'L':''}${gr.has_delivery_note?'D':''}</td><td>${esc(gr.received_by)}</td><td>${gr.created_at}</td><td class="actions"><button class="btn btn-info btn-sm" onclick="viewGR(${gr.id})">Preview</button><button class="btn btn-danger btn-sm" onclick="deleteGR(${gr.id})">Del</button></td></tr>`).join('');
+    } catch (e) { showToast('Failed to load GR','error'); }
+}
+async function openGRModal() {
+    document.getElementById('f-gr-supplier_name').value = '';
+    document.getElementById('f-gr-lpo').value = ''; document.getElementById('f-gr-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('f-gr-received-by').value = 'Kisakye Betty'; document.getElementById('f-gr-proc').value = 'Procuring Dept';
+    document.getElementById('f-gr-invoice').checked = document.getElementById('f-gr-lpo-doc').checked = document.getElementById('f-gr-dn').checked = true;
+    document.getElementById('f-gr-notes').value = ''; document.getElementById('gr-items-container').innerHTML = ''; addGRItem();
+    document.getElementById('modal-gr').classList.add('active');
+}
+function addGRItem() { const c = document.getElementById('gr-items-container'); const div = document.createElement('div'); div.className = 'item-row'; div.innerHTML = `<input type="text" placeholder="Description" style="flex:2" class="gr-desc"><input type="number" placeholder="Qty" style="width:70px" class="gr-qty" value="1" min="1"><select style="width:130px" class="gr-cat"><option value="">Category</option><option>System Unit</option><option>Monitor</option><option>Laptop</option><option>Printer</option><option>UPS</option><option>Scanner</option><option>Network Switch</option><option>Router</option><option>Other</option></select><input type="text" placeholder="Make/Model" style="flex:1" class="gr-make"><input type="number" placeholder="Unit Cost" style="width:100px" class="gr-cost"><input type="text" placeholder="Serial Nos (comma sep)" style="flex:2" class="gr-serial"><button class="btn-remove" onclick="removeGRItem(this)">x</button>`; c.appendChild(div); }
+function removeGRItem(btn) { const c = document.getElementById('gr-items-container'); if (c.children.length > 1) btn.parentElement.remove(); else showToast('Need at least one item','error'); }
+async function saveGR() {
+    const supplier_name = document.getElementById('f-gr-supplier_name').value.trim(), lpo_number = document.getElementById('f-gr-lpo').value.trim(), delivery_date = document.getElementById('f-gr-date').value;
+    const received_by = document.getElementById('f-gr-received-by').value.trim(), procurement_dept = document.getElementById('f-gr-proc').value.trim();
+    const has_invoice = document.getElementById('f-gr-invoice').checked, has_lpo = document.getElementById('f-gr-lpo-doc').checked, has_delivery_note = document.getElementById('f-gr-dn').checked, notes = document.getElementById('f-gr-notes').value.trim();
+    if (!supplier_name || !lpo_number || !delivery_date) { showToast('Supplier, LPO, and Delivery Date required','error'); return; }
+    const items = []; let ok = true;
+    document.querySelectorAll('#gr-items-container .item-row').forEach(row => {
+        const desc = row.querySelector('.gr-desc').value.trim(), qty = parseInt(row.querySelector('.gr-qty').value) || 1, cat = row.querySelector('.gr-cat').value, make = row.querySelector('.gr-make').value.trim(), cost = row.querySelector('.gr-cost').value, serial = row.querySelector('.gr-serial').value.trim();
+        if (!desc) { ok = false; return; } items.push({ description:desc, quantity:qty, category:cat, unit_cost:cost||null, serial_numbers:serial, make_model:make });
+    });
+    if (!ok) { showToast('Item description required','error'); return; }
+    try { const res = await fetch(`${API}/goods_received`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({supplier_name,lpo_number,delivery_date,received_by,procurement_dept,has_invoice,has_lpo,has_delivery_note,notes,items})}); const r = await res.json(); if (res.ok) { showToast('Goods received!','success'); closeModal('modal-gr'); loadGR(); loadDashboard(); } else showToast(r.error||'Failed','error'); } catch (e) { showToast('Server connection failed','error'); }
+}
+async function viewGR(id) {
+    try { const res = await fetch(`${API}/goods_received_item/${id}`); const gr = await res.json();
+        const docs = [gr.has_invoice?'Invoice':'', gr.has_lpo?'LPO':'', gr.has_delivery_note?'Delivery Note':''].filter(Boolean).join(', ') || 'None';
+        const total = (gr.items||[]).reduce((s,i) => s + (Number(i.unit_cost)||0)*(Number(i.quantity)||0), 0);
+        let html = `<div class="modal" style="width:760px"><div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h2>Goods Received #${gr.id}</h2><span style="font-size:12px;color:#999">${gr.created_at}</span></div>
+        <div class="gr-preview-header no-print"><div class="gr-title">GR-#${gr.id}</div><div class="gr-meta">${gr.created_at}</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+            <div><strong>Supplier</strong><br>${esc(gr.supplier_name)}</div>
+            <div><strong>LPO Number</strong><br>${esc(gr.lpo_number)}</div>
+            <div><strong>Delivery Date</strong><br>${gr.delivery_date}</div>
+            <div><strong>Received By</strong><br>${esc(gr.received_by)}</div>
+            <div><strong>Procuring Dept</strong><br>${esc(gr.procurement_dept)}</div>
+            <div><strong>Documents</strong><br>${docs}</div>
+        </div>
+        ${gr.notes ? `<p style="margin-bottom:12px"><strong>Notes:</strong> ${esc(gr.notes)}</p>` : ''}
+        <h3 style="font-size:14px;margin-bottom:8px">Items Received (${(gr.items||[]).length})</h3>
+        <table><thead><tr><th>Item</th><th>Qty</th><th>Category</th><th>Unit Cost</th><th>Total</th><th>Serials</th></tr></thead><tbody>`;
+        (gr.items||[]).forEach(i => { const unit = Number(i.unit_cost)||0; const qty = Number(i.quantity)||0; html += `<tr><td>${esc(i.description)}</td><td>${qty}</td><td>${esc(i.category)}</td><td>${unit.toLocaleString()}</td><td>${(unit*qty).toLocaleString()}</td><td style="font-size:12px">${esc(i.serial_numbers)||'-'}</td></tr>`; });
+        html += `</tbody><tfoot><tr><td colspan="5" style="text-align:right;font-weight:700">Grand Total</td><td style="font-weight:700">${total.toLocaleString()} UGX</td></tr></tfoot></table>`;
+        if (gr.assets_created && gr.assets_created.length) { html += `<h3 style="font-size:14px;margin:16px 0 8px">Assets Created (${gr.assets_created.length})</h3><table><thead><tr><th>#</th><th>Asset Tag</th><th>Serial No</th></tr></thead><tbody>`; gr.assets_created.forEach((a,i) => { html += `<tr><td>${i+1}</td><td>${esc(a.asset_tag)}</td><td>${esc(a.serial_no)||'-'}</td></tr>`; }); html += `</tbody></table>`; }
+        html += `<div class="modal-actions" style="border-top:1px solid var(--border);padding-top:16px;margin-top:16px">
+            <button class="btn btn-primary" onclick="window.print()"><span class="material-symbols-outlined" style="font-size:16px">print</span> Print</button>
+            <button class="btn btn-success" onclick="window.open('${API}/report?type=gr&id=${id}','_blank')"><span class="material-symbols-outlined" style="font-size:16px">download</span> Download PDF</button>
+            <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+        </div></div>`;
+        const overlay = document.createElement('div'); overlay.className = 'modal-overlay active'; overlay.innerHTML = html; overlay.onclick = function(e) { if (e.target===this) this.remove(); }; document.body.appendChild(overlay);
+    } catch (e) { showToast('Failed to load GR details','error'); }
+}
+async function deleteGR(id) { if (!confirm('Delete GR record?')) return; try { const res = await fetch(`${API}/goods_received_item/${id}`,{method:'DELETE'}); if (res.ok) { showToast('Deleted','success'); loadGR(); loadDashboard(); } else { const r = await res.json(); showToast(r.error||'Failed','error'); } } catch(e) { showToast('Server connection failed','error'); } }
+
+// ── Goods Issued ──
+async function loadGI() {
+    try { const s = document.getElementById('giSearch').value; const res = await fetch(`${API}/goods_issued?search=${encodeURIComponent(s)}`); const d = await res.json();
+        document.getElementById('giBody').innerHTML = !d.data||!d.data.length ? `<tr><td colspan="8"><div class="empty-state"><h3>No goods issued</h3></div></td></tr>`
+            : d.data.map(gi => `<tr><td>#${gi.id}</td><td><strong>${esc(gi.department)}</strong></td><td>${esc(gi.officer_name)}</td><td>${gi.issue_date}</td><td>${gi.items_count||0} items</td><td>${esc(gi.issued_by)}</td><td>${gi.created_at}</td><td class="actions"><button class="btn btn-info btn-sm" onclick="viewGI(${gi.id})">View</button><button class="btn btn-warning btn-sm" onclick="openReturnModal(${gi.id})">Return</button><button class="btn btn-danger btn-sm" onclick="deleteGI(${gi.id})">Del</button></td></tr>`).join('');
+    } catch (e) { showToast('Failed to load GI','error'); }
+}
+async function openGIModal() {
+    try { const [resDept, resStock] = await Promise.all([fetch(`${API}/departments`), fetch(`${API}/stock/available`)]); departments = (await resDept.json()).data||[]; availableStockItems = (await resStock.json()).data||[];
+        const deptSel = document.getElementById('f-gi-dept'); deptSel.innerHTML = '<option value="">-- Select --</option>'; departments.forEach(d => deptSel.innerHTML += `<option value="${esc(d.name)}">${esc(d.name)}</option>`);
+        document.getElementById('f-gi-date').value = new Date().toISOString().split('T')[0]; document.getElementById('f-gi-officer').value = ''; document.getElementById('f-gi-title').value = ''; document.getElementById('f-gi-issued-by').value = 'Kisakye Betty'; document.getElementById('f-gi-notes').value = ''; document.getElementById('gi-search-asset').value = '';
+        renderStockSelectList(); document.getElementById('modal-gi').classList.add('active');
+    } catch (e) { showToast('Failed to load data','error'); }
+}
+function renderStockSelectList() {
+    const search = (document.getElementById('gi-search-asset').value||'').toLowerCase();
+    const list = document.getElementById('gi-stock-list');
+    const filtered = availableStockItems.filter(s => (s.item_code||'').toLowerCase().includes(search)||(s.serial_no||'').toLowerCase().includes(search)||(s.category||'').toLowerCase().includes(search)||(s.make_model||'').toLowerCase().includes(search));
+    if (!filtered.length) { list.innerHTML = '<p style="color:#999;padding:10px">No stock items available</p>'; return; }
+    list.innerHTML = `<label class="sel-all"><input type="checkbox" onchange="document.querySelectorAll('.gi-stock-cb').forEach(c=>c.checked=this.checked)"> Select All (${filtered.length})</label>` +
+        filtered.map(s => `<label><input type="checkbox" class="gi-stock-cb" value="${s.id}"> ${esc(s.item_code)} — ${esc(s.category)} ${s.make_model?'('+esc(s.make_model)+')':''} ${s.serial_no?'SN:'+esc(s.serial_no):''}</label>`).join('');
+}
+function toggleSelectAll() { document.querySelectorAll('.gi-stock-cb').forEach(c => c.checked = document.getElementById('gi-select-all').checked); }
+async function saveGI() {
+    const department = document.getElementById('f-gi-dept').value, issue_date = document.getElementById('f-gi-date').value, officer_name = document.getElementById('f-gi-officer').value.trim();
+    const officer_title = document.getElementById('f-gi-title').value.trim(), issued_by = document.getElementById('f-gi-issued-by').value.trim(), notes = document.getElementById('f-gi-notes').value.trim();
+    if (!department || !issue_date || !officer_name) { showToast('Department, Date, Officer required','error'); return; }
+    const stock_item_ids = Array.from(document.querySelectorAll('.gi-stock-cb:checked')).map(cb => parseInt(cb.value));
+    if (!stock_item_ids.length) { showToast('Select at least one stock item','error'); return; }
+    try { const res = await fetch(`${API}/goods_issued`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({department,issue_date,officer_name,officer_title,issued_by,notes,stock_item_ids})}); const r = await res.json(); if (res.ok) { showToast(`Issued ${r.issued||r.items_issued} item(s)`,'success'); closeModal('modal-gi'); loadGI(); loadDashboard(); } else { showToast(r.error||'Failed','error'); } } catch(e) { showToast('Server connection failed','error'); }
+}
+async function viewGI(id) {
+    try { const res = await fetch(`${API}/goods_issued_item/${id}`); const gi = await res.json();
+        let html = `<div class="modal" style="display:block;margin:20px auto;width:700px"><h2>Goods Issued #${gi.id}</h2><p><strong>Department:</strong> ${esc(gi.department)}</p><p><strong>Officer:</strong> ${esc(gi.officer_name)} ${gi.officer_title?'('+esc(gi.officer_title)+')':''}</p><p><strong>Date:</strong> ${gi.issue_date} <strong>By:</strong> ${esc(gi.issued_by)}</p>${gi.notes?'<p><strong>Notes:</strong> '+esc(gi.notes)+'</p>':''}<table style="margin-top:12px"><thead><tr><th>Item Code</th><th>Serial</th><th>Category</th><th>Make/Model</th></tr></thead><tbody>`;
+        (gi.items||[]).forEach(i => { html += `<tr><td>${esc(i.item_code)}</td><td>${esc(i.serial_no)||'-'}</td><td>${esc(i.category)}</td><td>${esc(i.make_model)||'-'}</td></tr>`; });
+        html += `</tbody></table><div class="modal-actions"><button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button></div></div>`;
+        const overlay = document.createElement('div'); overlay.className = 'modal-overlay active'; overlay.innerHTML = html; overlay.onclick = function(e) { if (e.target===this) this.remove(); }; document.body.appendChild(overlay);
+    } catch (e) { showToast('Failed to load GI details','error'); }
+}
+
+// ── Return to Store ──
+let returnGIId = null;
+async function openReturnModal(giId) {
+    returnGIId = giId;
+    try {
+        const res = await fetch(`${API}/goods_issued_item/${giId}`); const gi = await res.json();
+        document.getElementById('returnDeptName').textContent = esc(gi.department) + ' (' + esc(gi.officer_name) + ')';
+        const list = document.getElementById('returnAssetList');
+        list.innerHTML = (gi.items||[]).map(i => `<label><input type="checkbox" class="return-asset-cb" value="${i.asset_id||i.id}"> ${esc(i.item_code||i.asset_tag)} — ${esc(i.category)} ${esc(i.make_model)}</label>`).join('');
+        if (!gi.items||!gi.items.length) { list.innerHTML = '<p style="color:#999;padding:10px">No items in this issue.</p>'; }
+        document.getElementById('f-return-notes').value = '';
+        document.getElementById('modal-return').classList.add('active');
+    } catch (e) { showToast('Failed to load issue details','error'); }
+}
+async function saveReturn() {
+    const asset_ids = Array.from(document.querySelectorAll('.return-asset-cb:checked')).map(cb => parseInt(cb.value));
+    if (!asset_ids.length) { showToast('Select assets to return','error'); return; }
+    const notes = document.getElementById('f-return-notes').value.trim();
+    try {
+        const res = await fetch(`${API}/return_assets`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({asset_ids, notes, changed_by:'Kisakye Betty'})});
+        const r = await res.json(); if (res.ok) { showToast(`${r.returned} asset(s) returned`,'success'); closeModal('modal-return'); loadGI(); loadDashboard(); } else { showToast(r.error||'Failed','error'); }
+    } catch (e) { showToast('Server connection failed','error'); }
+}
+async function deleteGI(id) { if (!confirm('Delete GI record?')) return; try { const res = await fetch(`${API}/goods_issued_del/${id}`,{method:'DELETE'}); if (res.ok) { showToast('Deleted','success'); loadGI(); } else { const r = await res.json(); showToast(r.error||'Failed','error'); } } catch(e) { showToast('Server connection failed','error'); } }
+
+// ── Movements Page ──
+async function loadMovements() {
+    const search = document.getElementById('movSearch').value, type = document.getElementById('movType').value, itemType = document.getElementById('movItemType').value, from = document.getElementById('movFrom').value, to = document.getElementById('movTo').value;
+    const params = new URLSearchParams({ type, from_date: from, to_date: to });
+    if (itemType) params.set('item_type', itemType);
+    try {
+        const res = await fetch(`${API}/all_movements?${params}`); const d = await res.json();
+        const filtered = search ? (d.data||[]).filter(m => (m.item_code||m.asset_tag||'').toLowerCase().includes(search.toLowerCase())||(m.serial_no||'').toLowerCase().includes(search.toLowerCase())) : (d.data||[]);
+        const tbody = document.getElementById('movBody');
+        if (!filtered.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><h3>No movements found</h3></div></td></tr>`; return; }
+        tbody.innerHTML = filtered.map(m => `<tr>
+            <td style="white-space:nowrap">${m.created_at||''}</td>
+            <td><strong>${esc(m.item_code||m.asset_tag||'')}</strong>${m.serial_no ? '<br><small>'+esc(m.serial_no)+'</small>' : ''}</td>
+            <td><span class="status-badge">${esc(m.item_type||'-')}</span></td>
+            <td><span class="status-badge">${esc(m.movement_type)}</span></td>
+            <td>${esc(m.from_status||m.from_location||'-')}</td>
+            <td>${esc(m.to_status||m.to_location||'-')}</td>
+            <td>${m.reference_type ? esc(m.reference_type)+' #'+m.reference_id : '-'}</td>
+            <td>${esc(m.changed_by)||'-'}</td>
+        </tr>`).join('');
+    } catch (e) { showToast('Failed to load movements','error'); }
+}
+function exportMovCSV() {
+    const type = document.getElementById('movType').value, from = document.getElementById('movFrom').value, to = document.getElementById('movTo').value;
+    window.open(`${API}/csv_export?type=movements&from_date=${from}&to_date=${to}&movement_type=${type}`, '_blank');
+}
+
+// ── Reports Page ──
+function toggleRptFilters() {
+    const type = document.getElementById('rptType').value;
+    ['rptCategory','rptStatus','rptDept','rptMovType'].forEach(id => document.getElementById(id).style.display = 'none');
+    if (type === 'assets') { document.getElementById('rptCategory').style.display = 'inline-block'; document.getElementById('rptStatus').style.display = 'inline-block'; document.getElementById('rptDept').style.display = 'inline-block'; }
+    if (type === 'stock') document.getElementById('rptCategory').style.display = 'inline-block';
+    if (type === 'gi') document.getElementById('rptDept').style.display = 'inline-block';
+    if (type === 'movements') document.getElementById('rptMovType').style.display = 'inline-block';
+}
+document.getElementById('rptType').addEventListener('change', toggleRptFilters);
+toggleRptFilters();
+
+async function previewReport() {
+    const type = document.getElementById('rptType').value, from = document.getElementById('rptFrom').value, to = document.getElementById('rptTo').value;
+    const params = new URLSearchParams({ type, from_date: from, to_date: to, status: document.getElementById('rptStatus').value, category: document.getElementById('rptCategory').value, department: document.getElementById('rptDept').value, movement_type: document.getElementById('rptMovType').value });
+    try {
+        const res = await fetch(`${API}/csv_export?${params}`); const text = await res.text();
+        const lines = text.trim().split('\n').slice(1);
+        const data = lines.map(l => l.split(',').map(c => c.replace(/^"|"$/g,'')));
+        document.getElementById('rptSummary').textContent = `Report: ${type.toUpperCase()}  |  ${data.length} records  |  ${from||'any'} → ${to||'any'}`;
+        const head = document.getElementById('rptHead'); const body = document.getElementById('rptBody');
+        if (!data.length) { head.innerHTML = ''; body.innerHTML = `<tr><td colspan="10"><div class="empty-state"><h3>No matching records</h3></div></td></tr>`; return; }
+        const headers = type === 'stock' ? ['Item Code','Serial No','Category','Make/Model','Source','GR Ref'] :
+                        type === 'assets' ? ['Asset Tag','Category','Make/Model','Serial No','Location','Status','Department'] :
+                        type === 'gr' ? ['ID','Supplier','LPO','Date','Items','Received By'] :
+                        type === 'gi' ? ['ID','Department','Officer','Date','Items','Issued By'] :
+                        type === 'damaged' ? ['Asset Tag','Category','Status','Location','Notes'] :
+                        ['Date','Item','Type','From','To','Ref','Changed By'];
+        head.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+        body.innerHTML = data.slice(0,500).map(r => `<tr>${Array.from({length:headers.length},(_,i) => `<td>${esc(r[i]||'')}</td>`).join('')}</tr>`).join('');
+    } catch (e) { showToast('Failed to preview','error'); }
+}
+function exportReportPDF() {
+    const type = document.getElementById('rptType').value;
+    const params = new URLSearchParams({ type, from_date: document.getElementById('rptFrom').value, to_date: document.getElementById('rptTo').value, status: document.getElementById('rptStatus').value, category: document.getElementById('rptCategory').value, department: document.getElementById('rptDept').value, movement_type: document.getElementById('rptMovType').value });
+    window.open(`${API}/report?${params}`, '_blank');
+}
+function exportReportCSV() {
+    const type = document.getElementById('rptType').value;
+    const params = new URLSearchParams({ type, from_date: document.getElementById('rptFrom').value, to_date: document.getElementById('rptTo').value, status: document.getElementById('rptStatus').value, category: document.getElementById('rptCategory').value, department: document.getElementById('rptDept').value, movement_type: document.getElementById('rptMovType').value });
+    window.open(`${API}/csv_export?${params}`, '_blank');
+}
+
+// ── CSV Export/Import ──
+async function exportCSV() { window.open(`${API}/export`, '_blank'); }
+function downloadPDF() { const p = new URLSearchParams({search:document.getElementById('assetSearch').value,category:document.getElementById('assetFilterCategory').value,location:document.getElementById('assetFilterLocation').value,status:currentAssetFilter}); window.open(`${API}/report?type=assets&${p}`,'_blank'); }
+async function importCSV(file) {
+    if (!file) return; const form = new FormData(); form.append('csv', file);
+    try { const res = await fetch(`${API}/import`,{method:'POST',body:form}); const r = await res.json(); showToast(`Imported: ${r.imported}, Skipped: ${r.skipped}`,'success'); loadAssets(); loadDashboard(); } catch (e) { showToast('Import failed','error'); }
+    document.getElementById('csvFile').value = '';
+}
+
+// ── Filter dropdowns ──
+async function loadFilters() {
+    try {
+        const res = await fetch(`${API}/stats`); const d = await res.json();
+        if (d.by_category) {
+            const catHtml = d.by_category.map(i => `<option>${esc(i.category)}</option>`).join('');
+            document.getElementById('stockFilterCategory').innerHTML = '<option value="">All Categories</option>' + catHtml;
+            document.getElementById('assetFilterCategory').innerHTML = '<option value="">All Categories</option>' + catHtml;
+            document.getElementById('rptCategory').innerHTML = '<option value="">All Categories</option>' + catHtml;
+        }
+        if (d.by_location) {
+            document.getElementById('assetFilterLocation').innerHTML = '<option value="">All Locations</option>' + d.by_location.map(i => `<option>${esc(i.location)}</option>`).join('');
+        }
+        if (d.by_department) {
+            document.getElementById('rptDept').innerHTML = '<option value="">All Departments</option>' + d.by_department.map(i => `<option>${esc(i.department)}</option>`).join('');
+        }
+    } catch (e) {}
+}
+
+// ── Modal / Toast / Util ──
+function closeModal(id) { document.getElementById(id).classList.remove('active'); editAssetId = null; editStockId = null; }
+function showToast(msg, type) { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'toast toast-'+type+' show'; clearTimeout(el._timer); el._timer = setTimeout(() => el.classList.remove('show'),3000); }
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ── Init ──
+loadDashboard();
+loadFilters();
+</script>
+</body>
+</html>
